@@ -24,6 +24,7 @@ Use Pip (Python package manager) for the following:
 ```bash
 sudo pip install pyaudio
 sudo pip install opencv-python==4.5.3.56
+sudo pip install python-vlc
 ```
 
 ## Getting Started
