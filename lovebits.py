@@ -151,3 +151,4 @@ if __name__ == "__main__":
     # hardcoded for testing
     #record_video("something", 10)
     button_command(BUTTON_2)
+
