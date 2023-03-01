@@ -5,7 +5,9 @@ import vlc
 import recorder
 from constants import *
 
+
 # ***CONFIGURATIONS
+
 class Config:
     is_running = True
     media_player = vlc.MediaPlayer()
