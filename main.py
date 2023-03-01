@@ -1,4 +1,4 @@
 import lovebits
 
-if __name__ == "__main__":
-    lovebits.run()
+#if __name__ == "__main__":
+lovebits.run()

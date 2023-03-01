@@ -1,0 +1,137 @@
+2/27 21:21
+TODO:
+[X]Verify multi-button functionality
+[X]Script to automatically restart /lovebits main.play
+[ ]Rig up LED, figure out how that works.
+
+
+
+
+
+TASK: Verify existing functionality, write tests for TODO functionality
+
+*Video Recording* [VERIFIED]
+Merged video files are named according the button pressed.
+Works for all buttons 1 through 7.
+Test: Record videos for all 7 buttons in a random order. Restarting script after each action.
+Findings: My Button 7 was broken - replaced... testing again. 
+Fix: Updated pin to button assignment - now functions as expected.
+
+Unexpected video encoding error on button 4.  
+##Further testing realed that video recordings will occasionally fail, 
+observed ~1 out of 10 records being unsuccessful. When a recording does fail, 
+the program will begin a recording when playback was expected.
+Otherwise test worked as expected.
+
+*Video Playback* [VERIFIED]
+If a file path exists, play video
+Works for all butons 1 through 7.
+Test: Playback all recorded videos in random order.
+Fidnings: Works
+
+MILESTONE: Buttons all work. Continue testing on 1 to 2 buttons.
+Note: May still be good to do a lot of tests given the 1 out of 10 error above.
+
+TODO ITEM: *Video Erase*
+Pressing and holding each button results in any recorded video at the buttons specified file path to be deleted
+User does not need to press y or perform any other action besides pressing and holding the button
+If there is no file at the specified path the action should result in recording
+Program closes following action completion.
+Test: Using results from *Video Recording* delete all videos in a random order. Rerecord one or two videos to ensure that's working. Test Playback.
+Findings:
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+TASK: Create script to automatically restart /lovebits main.play*
+
+ATTEMPT 1 - CRONJOB
+Run crontab -e
+select text editor
+
+add this line:
+*/5 * * * * pgrep -f main.py || nohup python /home/lovebit/lovebits/main.py > test.out
+
+NOTE! That method wont work. Only practical for checking along 1 min intervals. Causes great strain at faster intervals.
+
+
+
+ATTEMPT 2 - SUBTASK
+I played around with the variables quite a bit but long story short:
+This thing either causes the CPU to get very hot, OR is checking if it needs to restart main.py so infrequently that it's not usable
+
+
+
+ATTEMPT 3:
+  _                              _       _   _       ____                                        
+ | |       ___   __   __   ___  | |__   (_) | |_    |  _ \   _   _   _ __    _ __     ___   _ __ 
+ | |      / _ \  \ \ / /  / _ \ | '_ \  | | | __|   | |_) | | | | | | '_ \  | '_ \   / _ \ | '__|
+ | |___  | (_) |  \ V /  |  __/ | |_) | | | | |_    |  _ <  | |_| | | | | | | | | | |  __/ | |   
+ |_____|  \___/    \_/    \___| |_.__/  |_|  \__|   |_| \_\  \__,_| |_| |_| |_| |_|  \___| |_|   TM
+ A service.
+
+ Use a process manager like systemd to automatically start and manage your Python script. 
+                                                                                                
+1. Navigate to the /etc/systemd/system/ directory by typing the following command in the terminal and pressing Enter:
+cd /etc/systemd/system/
+
+2. Create the lovebit_runner.service file in the /etc/systemd/system/ directory using a text editor. For example, you can use the Nano editor by typing the following command and pressing Enter:
+sudo nano lovebit_runner.service
+
+In the text editor, copy and paste the following content into the file:
+
+///////
+
+[Unit]
+Description=Lovebit Runner Service
+After=multi-user.target
+Conflicts=getty@tty1.service
+ 
+[Service]
+Type=simple
+Restart=always
+RestartSec=3
+ExecStart=/usr/bin/python3 /home/lovebit/lovebits/main.py
+StandardInput=tty-force
+ 
+[Install]
+WantedBy=multi-user.target
+
+\\\\\\\
+
+3. Tell systemd to reload its configuration files by typing the following command in the terminal and pressing Enter:
+sudo systemctl daemon-reload
+
+4. Start the service by typing the following command in the terminal and pressing Enter:
+sudo systemctl start lovebit_runner.service
+
+5. Verify that the service is running by typing the following command in the terminal and pressing Enter:
+sudo systemctl status lovebit_runner.service
+
+The output should indicate that the service is active (running). (Hit Ctrl+Z to exit the output view)
+
+6. Enable the service to start automatically at boot time by typing the following command in the terminal and pressing Enter:
+sudo systemctl enable lovebit_runner.service
+
+Congratulations! You have created a service file for your Python script and started the service using systemd. :)
+Now your Python script will automatically start and restart if it crashes or if the Raspberry Pi is rebooted.
+
+NOTE! This method failed. Service ran successfully but resulted in the same threading errors seen when condition to end program after action is removed.
+
+
+ATTEMPT 4: CPX PYTHON
+Install CircuitPython on a CPX:
+Follow this guide to install: https://learn.adafruit.com/welcome-to-circuitpython/installing-circuitpython
+NOTE: I did all these steps on my macbook, not on the rpi.
+After install complete you should see code.py in the CDX's memory. Replace it with the code.py file in the repository.
+It is ready - when plugged into the rpi via usb, pressing the B button will enter the necessary key commands to:
+- open the terminal
+- navigate to the lovebits directory
+- type "python main.py" followed by the enter key like 20 times
+
+SUCCESS
+- I found this will queue commands which are immediately exectued one after the other resulting in the behavior we want :D

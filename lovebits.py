@@ -5,7 +5,6 @@ import vlc
 import recorder
 from constants import *
 
-
 # ***CONFIGURATIONS
 class Config:
     is_running = True
@@ -16,8 +15,8 @@ class Config:
         BUTTON_3: 13,
         BUTTON_4: 19,
         BUTTON_5: 26,
-        BUTTON_6: 16,
-        BUTTON_7: 20
+        BUTTON_6: 20,
+        BUTTON_7: 21
     }
     buttons_to_files = {
         BUTTON_1: FILE_NAME + "_1",
@@ -55,6 +54,21 @@ def init_program():
     # Button 2
     GPIO.setup(Config.pins_to_buttons[BUTTON_2], GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_2], GPIO.FALLING, callback=lambda x: button_command(BUTTON_2))
+    # Button 3
+    GPIO.setup(Config.pins_to_buttons[BUTTON_3], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_3], GPIO.FALLING, callback=lambda x: button_command(BUTTON_3))
+    # Button 4
+    GPIO.setup(Config.pins_to_buttons[BUTTON_4], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_4], GPIO.FALLING, callback=lambda x: button_command(BUTTON_4))
+    # Button 5
+    GPIO.setup(Config.pins_to_buttons[BUTTON_5], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_5], GPIO.FALLING, callback=lambda x: button_command(BUTTON_5))
+    # Button 6
+    GPIO.setup(Config.pins_to_buttons[BUTTON_6], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_6], GPIO.FALLING, callback=lambda x: button_command(BUTTON_6))
+    # Button 7
+    GPIO.setup(Config.pins_to_buttons[BUTTON_7], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_7], GPIO.FALLING, callback=lambda x: button_command(BUTTON_7))
 
 
 ##
@@ -111,6 +125,8 @@ def play_video(file_name):
     Config.media_player.play()
     time.sleep(10)
     Config.media_player.release()
+    # After a playing, we shut down the program since that also causes issues.
+    Config.is_running = False
 
 
 ##
@@ -132,4 +148,4 @@ if __name__ == "__main__":
     init_program()
     # hardcoded for testing
     #record_video("something", 10)
-    button_command(BUTTON_1)
+    button_command(BUTTON_2)
