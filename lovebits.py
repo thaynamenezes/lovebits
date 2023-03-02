@@ -55,7 +55,21 @@ def init_program():
     # Button 2
     GPIO.setup(Config.pins_to_buttons[BUTTON_2], GPIO.IN, pull_up_down=GPIO.PUD_UP)
     GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_2], GPIO.FALLING, callback=lambda x: button_command(BUTTON_2))
-
+    # Button 3
+    GPIO.setup(Config.pins_to_buttons[BUTTON_3], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_3], GPIO.FALLING, callback=lambda x: button_command(BUTTON_3))
+    # Button 4
+    GPIO.setup(Config.pins_to_buttons[BUTTON_4], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_4], GPIO.FALLING, callback=lambda x: button_command(BUTTON_4))
+    # Button 5
+    GPIO.setup(Config.pins_to_buttons[BUTTON_5], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_5], GPIO.FALLING, callback=lambda x: button_command(BUTTON_5))
+    # Button 6
+    GPIO.setup(Config.pins_to_buttons[BUTTON_6], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_6], GPIO.FALLING, callback=lambda x: button_command(BUTTON_6))
+    # Button 7
+    GPIO.setup(Config.pins_to_buttons[BUTTON_7], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_7], GPIO.FALLING, callback=lambda x: button_command(BUTTON_7))
 
 ##
 # Runs upon a button action/press. Two possible actions exist:
@@ -76,7 +90,7 @@ def button_command(button_name):
 ##
 # Records video for the specified file name and recording time.
 ##
-def record_video(file_name, record_time):
+def record_video(file_name, record_time):    
     # Validate recording time is acceptable
     if record_time < 10:
         print("Invalid recording time provided. Please provide a time equal or longer than 10 seconds.")
@@ -107,6 +121,7 @@ def record_video(file_name, record_time):
 ##
 def play_video(file_name):
     media = vlc.Media(file_name)
+    Config.media_player.set_fullscreen(True)
     Config.media_player.set_media(media)
     Config.media_player.play()
     time.sleep(10)
@@ -118,7 +133,7 @@ def play_video(file_name):
 # using number values 1 to 8
 ##
 def create_file_name(file_name):
-    for i in range(1, 9):
+    for i in range(1, 8):
         new_file_name = "{file_name}_{i}".format(file_name=file_name, i=i)
         local_path = os.getcwd()
         if os.path.exists(str(local_path) + "/" + new_file_name + ".avi"):
