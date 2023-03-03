@@ -1,6 +1,6 @@
 import os
 import time
-import RPi.GPIO as GPIO
+from gpiozero import Button
 import vlc
 import recorder
 from constants import *
@@ -8,6 +8,7 @@ from constants import *
 
 # ***CONFIGURATIONS
 class Config:
+    is_pressed = True
     is_running = True
     media_player = vlc.MediaPlayer()
     pins_to_buttons = {
@@ -28,6 +29,7 @@ class Config:
         BUTTON_6: FILE_NAME + "_6",
         BUTTON_7: FILE_NAME + "_7",
     }
+    button_1 = None
 # ***END CONFIGURATIONS
 
 
@@ -47,37 +49,60 @@ def run():
 # all configurations
 ##
 def init_program():
-    # Setup the button pins as inputs with a pull-up resistor
-    GPIO.setmode(GPIO.BCM)
-    # Button 1
-    GPIO.setup(Config.pins_to_buttons[BUTTON_1], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_1], GPIO.FALLING, callback=lambda x: button_command(BUTTON_1))
-    # Button 2
-    GPIO.setup(Config.pins_to_buttons[BUTTON_2], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_2], GPIO.FALLING, callback=lambda x: button_command(BUTTON_2))
-    # Button 3
-    GPIO.setup(Config.pins_to_buttons[BUTTON_3], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_3], GPIO.FALLING, callback=lambda x: button_command(BUTTON_3))
-    # Button 4
-    GPIO.setup(Config.pins_to_buttons[BUTTON_4], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_4], GPIO.FALLING, callback=lambda x: button_command(BUTTON_4))
-    # Button 5
-    GPIO.setup(Config.pins_to_buttons[BUTTON_5], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_5], GPIO.FALLING, callback=lambda x: button_command(BUTTON_5))
-    # Button 6
-    GPIO.setup(Config.pins_to_buttons[BUTTON_6], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_6], GPIO.FALLING, callback=lambda x: button_command(BUTTON_6))
-    # Button 7
-    GPIO.setup(Config.pins_to_buttons[BUTTON_7], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(Config.pins_to_buttons[BUTTON_7], GPIO.FALLING, callback=lambda x: button_command(BUTTON_7))
+    # Setup the buttons along with their callback functions
+    Button.was_held = False
+
+    #Button 1
+    button_1 = Button(Config.pins_to_buttons[BUTTON_1], hold_time=BUTTON_HOLD_TIME_SECONDS)
+    button_1.when_released = lambda x: button_release(BUTTON_1, button_1)
+    button_1.when_held = lambda x: button_held(BUTTON_1, button_1)
+    recorder.VideoRecorder.num_threads += 1
+    #Button 2
+    button_2 = Button(Config.pins_to_buttons[BUTTON_2], hold_time=BUTTON_HOLD_TIME_SECONDS)
+    button_2.when_released = lambda x: button_release(BUTTON_2, button_2)
+    button_2.when_held = lambda x: button_held(BUTTON_2, button_2)
+    recorder.VideoRecorder.num_threads += 1
+    #Button 3
+    button_3 = Button(Config.pins_to_buttons[BUTTON_3], hold_time=BUTTON_HOLD_TIME_SECONDS)
+    button_3.when_released = lambda x: button_release(BUTTON_3, button_3)
+    button_3.when_held = lambda x: button_held(BUTTON_3, button_3)
+    recorder.VideoRecorder.num_threads += 1
+    #Button 4
+    button_4 = Button(Config.pins_to_buttons[BUTTON_4], hold_time=BUTTON_HOLD_TIME_SECONDS)
+    button_4.when_released = lambda x: button_release(BUTTON_4, button_4)
+    button_4.when_held = lambda x: button_held(BUTTON_4, button_4)
+    recorder.VideoRecorder.num_threads += 1
+    #Button 5
+    button_5 = Button(Config.pins_to_buttons[BUTTON_5], hold_time=BUTTON_HOLD_TIME_SECONDS)
+    button_5.when_released = lambda x: button_release(BUTTON_5, button_5)
+    button_5.when_held = lambda x: button_held(BUTTON_5, button_5)
+    recorder.VideoRecorder.num_threads += 1
+    #Button 6
+    button_6 = Button(Config.pins_to_buttons[BUTTON_6], hold_time=BUTTON_HOLD_TIME_SECONDS)
+    button_6.when_released = lambda x: button_release(BUTTON_6, button_6)
+    button_6.when_held = lambda x: button_held(BUTTON_6, button_6)
+    recorder.VideoRecorder.num_threads += 1
+    #Button 7
+    button_7 = Button(Config.pins_to_buttons[BUTTON_7], hold_time=BUTTON_HOLD_TIME_SECONDS)
+    button_7.when_released = lambda x: button_release(BUTTON_7, button_7)
+    button_7.when_held = lambda x: button_held(BUTTON_7, button_7)
+    recorder.VideoRecorder.num_threads += 1
+
 
 ##
 # Runs upon a button action/press. Two possible actions exist:
 # 1. If a file for the button exists, its recorded video will play
 # 2. If a file for the button does not exist, a recording for it
 #    will begin and be saved to it
+#
+# button_name => name of button so it can be mapped to the correct file
+# gpio_button => GPIOZero button object, needed to know the state of the button hold/press
 ##
-def button_command(button_name):
+def button_release(button_name, gpio_button):
+    if gpio_button.was_held:
+        gpio_button.was_held = False
+        return
+    
     file_name = Config.buttons_to_files[button_name]
     local_path = os.getcwd()
     # 1. File exists? Play video
@@ -85,6 +110,20 @@ def button_command(button_name):
         play_video(file_name + ".avi")
     else:
         record_video(file_name, RECORD_TIME_SECONDS)
+
+
+##
+# On a button hold action, a video is recorded regardless if there
+# is a video already mapped to the called button. The new video 
+# overwrites the existing one.
+#
+# button_name => name of button so it can be mapped to the correct file
+# gpio_button => GPIOZero button object, needed to know the state of the button hold/press
+##
+def button_held(button_name, gpio_button):
+    gpio_button.was_held = True
+    file_name = Config.buttons_to_files[button_name]
+    record_video(file_name, RECORD_TIME_SECONDS)
 
 
 ##
@@ -114,7 +153,6 @@ def record_video(file_name, record_time):
     Config.is_running = False
 
 
-
 ##
 # Plays a video with the vlc media player for
 # the specified file name
@@ -126,6 +164,8 @@ def play_video(file_name):
     Config.media_player.play()
     time.sleep(10)
     Config.media_player.release()
+    # After video is finished, shut down the program to avoid threading issues
+    Config.is_running = False
 
 
 ##
@@ -147,4 +187,4 @@ if __name__ == "__main__":
     init_program()
     # hardcoded for testing
     #record_video("something", 10)
-    button_command(BUTTON_1)
+    button_release(BUTTON_1)

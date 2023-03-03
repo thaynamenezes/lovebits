@@ -1,5 +1,6 @@
 FILE_NAME = "Test_Lovebits"
 RECORD_TIME_SECONDS = 10
+BUTTON_HOLD_TIME_SECONDS = 2
 
 BUTTON_1 = "button_1"
 BUTTON_2 = "button_2"

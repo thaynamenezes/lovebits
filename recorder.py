@@ -39,7 +39,8 @@ import os
 
 class VideoRecorder():
 	
-	
+	# static property for active number of threads. Default is two (one for recording video, one for audio)
+	num_threads = 2
 	
 	# Video class based on openCV 
 	def __init__(self):
@@ -223,7 +224,7 @@ def stop_AVrecording(filename):
 	video_thread.stop() 
 
 	# Makes sure the threads have finished
-	while threading.active_count() > 3:
+	while threading.active_count() > VideoRecorder.num_threads:
 		time.sleep(1)
 
 	
