@@ -39,7 +39,8 @@ import os
 
 class VideoRecorder():
 	
-	
+	# static property for active number of threads. Default is two (one for recording video, one for audio)
+	num_threads = 2
 	
 	# Video class based on openCV 
 	def __init__(self):
@@ -59,11 +60,14 @@ class VideoRecorder():
 	
 	# Video starts being recorded 
 	def record(self):
-		
 #		counter = 1
+
+		# Added lines to set video fullscreen
+		cv2.namedWindow("video_frame", cv2.WND_PROP_FULLSCREEN)
+		cv2.setWindowProperty("video_frame", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
 		timer_start = time.time()
-		timer_current = 0
-		
+		timer_current = 0		
 		
 		while(self.open==True):
 			ret, video_frame = self.video_cap.read()
@@ -74,13 +78,13 @@ class VideoRecorder():
 					self.frame_counts += 1
 #					counter += 1
 #					timer_current = time.time() - timer_start
-					time.sleep(0.16)
+					time.sleep(0.04) # 0.04 delay -> 24 fps
 					
 					# Uncomment the following three lines to make the video to be
 					# displayed to screen while recording
 					
-					gray = cv2.cvtColor(video_frame, cv2.COLOR_BGR2GRAY)
-					cv2.imshow('video_frame', gray)
+					gray_video_frame = cv2.cvtColor(video_frame, cv2.COLOR_BGR2GRAY)
+					cv2.imshow('video_frame', video_frame) # set this to gray_video_frame if you want it to look black and white
 					cv2.waitKey(1)
 			else:
 				break
@@ -171,8 +175,7 @@ class AudioRecorder():
 	
 
 
-def start_AVrecording(filename):
-				
+def start_AVrecording(filename):				
 	global video_thread
 	global audio_thread
 	
@@ -221,7 +224,7 @@ def stop_AVrecording(filename):
 	video_thread.stop() 
 
 	# Makes sure the threads have finished
-	while threading.active_count() > 2:
+	while threading.active_count() > VideoRecorder.num_threads:
 		time.sleep(1)
 
 	
