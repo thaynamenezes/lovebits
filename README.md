@@ -26,6 +26,7 @@ sudo pip install pyaudio
 sudo pip install opencv-python==4.5.3.56
 sudo pip install python-vlc
 sudo pip install gpiozero
+sudo pip install playsound
 ```
 
 ## Getting Started

@@ -4,6 +4,8 @@ from gpiozero import Button
 import vlc
 import recorder
 from constants import *
+from pydub import AudioSegment
+from pydub.playback import play
 
 
 # ***CONFIGURATIONS
@@ -123,7 +125,18 @@ def button_release(button_name, gpio_button):
 def button_held(button_name, gpio_button):
     gpio_button.was_held = True
     file_name = Config.buttons_to_files[button_name]
-    record_video(file_name, RECORD_TIME_SECONDS)
+    local_path = os.getcwd()
+    if os.path.exists(str(local_path) + "/" + file_name + ".avi"):
+        os.remove(str(local_path) + "/" + file_name + ".avi")
+        erase = AudioSegment.from_wav("sounds/erase.wav")
+        play(erase)
+        Config.is_running = False
+    else:
+        nothing = AudioSegment.from_wav("sounds/nothing.wav")
+        play(nothing)
+        print("No file to erase")
+#       record_video(file_name, RECORD_TIME_SECONDS)
+#   record_video(file_name, RECORD_TIME_SECONDS)
 
 
 ##
@@ -138,7 +151,9 @@ def record_video(file_name, record_time):
     # files and the main file where both the audio
     # and image will be saved
     recorder.file_manager(file_name)
-
+    #play some audio to indicate recording has begun
+    record = AudioSegment.from_wav("sounds/record.wav")
+    play(record)
     # recording begins
     recorder.start_AVrecording(file_name)
     # recording will be uninterrupted for the 
@@ -147,6 +162,8 @@ def record_video(file_name, record_time):
     # After the timer is done, the recording is
     # stopped and the files are saved
     recorder.stop_AVrecording(file_name)
+    done = AudioSegment.from_wav("sounds/done.wav")
+    play(done)
     print("Recording completed")
     
     # After a recording, we shut down the program due to potential threading issues
