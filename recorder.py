@@ -182,8 +182,10 @@ def start_AVrecording(filename):
 	video_thread = VideoRecorder()
 	audio_thread = AudioRecorder()
 
-	audio_thread.start()
+	
 	video_thread.start()
+	time.sleep(.3)#mebeing silly
+	audio_thread.start()
 
 	return filename
 

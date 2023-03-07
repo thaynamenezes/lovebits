@@ -4,8 +4,9 @@ from gpiozero import Button
 import vlc
 import recorder
 from constants import *
-from pydub import AudioSegment
-from pydub.playback import play
+import simpleaudio as sa
+#from pydub import AudioSegment
+#from pydub.playback import play
 
 
 # ***CONFIGURATIONS
@@ -128,15 +129,13 @@ def button_held(button_name, gpio_button):
     local_path = os.getcwd()
     if os.path.exists(str(local_path) + "/" + file_name + ".avi"):
         os.remove(str(local_path) + "/" + file_name + ".avi")
-        erase = AudioSegment.from_wav("sounds/erase.wav")
-        play(erase)
+        erase_wave_obj = sa.WaveObject.from_wave_file("sounds/erase.wav")
+        play_obj = erase_wave_obj.play()
+        play_obj.wait_done()
         Config.is_running = False
     else:
-        nothing = AudioSegment.from_wav("sounds/nothing.wav")
-        play(nothing)
         print("No file to erase")
-#       record_video(file_name, RECORD_TIME_SECONDS)
-#   record_video(file_name, RECORD_TIME_SECONDS)
+
 
 
 ##
@@ -151,9 +150,18 @@ def record_video(file_name, record_time):
     # files and the main file where both the audio
     # and image will be saved
     recorder.file_manager(file_name)
+
+
     #play some audio to indicate recording has begun
-    record = AudioSegment.from_wav("sounds/record.wav")
-    play(record)
+    record_wave_obj = sa.WaveObject.from_wave_file("sounds/record.wav")
+    play_obj = record_wave_obj.play()
+
+
+#    record = AudioSegment.from_wav("sounds/record.wav")
+#    play(record)
+
+
+
     # recording begins
     recorder.start_AVrecording(file_name)
     # recording will be uninterrupted for the 
@@ -162,11 +170,15 @@ def record_video(file_name, record_time):
     # After the timer is done, the recording is
     # stopped and the files are saved
     recorder.stop_AVrecording(file_name)
-    done = AudioSegment.from_wav("sounds/done.wav")
-    play(done)
+    done_wave_obj = sa.WaveObject.from_wave_file("sounds/done.wav")
+    play_obj = done_wave_obj.play()
+    play_obj.wait_done()
+
+    
     print("Recording completed")
     
     # After a recording, we shut down the program due to potential threading issues
+    
     Config.is_running = False
 
 
@@ -175,6 +187,9 @@ def record_video(file_name, record_time):
 # the specified file name
 ##
 def play_video(file_name):
+    play_wave_obj = sa.WaveObject.from_wave_file("sounds/play.wav")
+    play_obj = play_wave_obj.play()
+    play_obj.wait_done()
     media = vlc.Media(file_name)
     Config.media_player.set_fullscreen(True)
     Config.media_player.set_media(media)
