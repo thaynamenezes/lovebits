@@ -130,6 +130,7 @@ def button_held(button_name, gpio_button):
         erase_wave_obj = sa.WaveObject.from_wave_file("sounds/erase.wav")
         play_obj = erase_wave_obj.play()
         play_obj.wait_done()
+        time.sleep(2)
         Config.is_running = False
     else:
         print("No file to erase")
