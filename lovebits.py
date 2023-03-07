@@ -5,8 +5,6 @@ import vlc
 import recorder
 from constants import *
 import simpleaudio as sa
-#from pydub import AudioSegment
-#from pydub.playback import play
 
 
 # ***CONFIGURATIONS
@@ -135,6 +133,7 @@ def button_held(button_name, gpio_button):
         Config.is_running = False
     else:
         print("No file to erase")
+        Config.is_running = False
 
 
 
