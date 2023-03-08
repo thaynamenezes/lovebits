@@ -189,13 +189,13 @@ def record_video(file_name, record_time):
 def play_video(file_name):
     play_wave_obj = sa.WaveObject.from_wave_file("sounds/play.wav")
     play_obj = play_wave_obj.play()
-    play_obj.wait_done()
     media = vlc.Media(file_name)
     Config.media_player.set_fullscreen(True)
     Config.media_player.set_media(media)
     Config.media_player.play()
     time.sleep(10)
     Config.media_player.release()
+    play_obj.wait_done()
     # After video is finished, shut down the program to avoid threading issues
     Config.is_running = False
 
